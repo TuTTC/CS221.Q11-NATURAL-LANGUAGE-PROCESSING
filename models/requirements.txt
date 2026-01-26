@@ -3,3 +3,4 @@ torch
 pytorch-crf
 numpy
 scikit-learn
+transformers
