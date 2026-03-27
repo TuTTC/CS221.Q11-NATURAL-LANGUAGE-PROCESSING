@@ -1,0 +1,53 @@
+# Data and Datasets
+data/
+*.csv
+*.xlsx
+*.tsv
+*.json
+*.jsonl
+
+# Models and Checkpoints
+models/
+checkpoints/
+outputs/
+logs/
+*.pth
+*.pt
+*.bin
+*.h5
+*.pickle
+*.pkl
+*.safetensors
+
+# Large Media and Documents
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.pdf
+*.mp4
+*.h5p
+*.png
+*.jpg
+*.jpeg
+docs/references/
+docs/lectures/
+
+# Python and Environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+env.bak/
+venv.bak/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

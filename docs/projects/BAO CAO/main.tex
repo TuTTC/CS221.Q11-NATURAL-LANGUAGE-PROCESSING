@@ -1,0 +1,437 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{vietnam}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xltabular}
+\usepackage{ragged2e} % để căn lề đẹp hơn
+
+% Định nghĩa kiểu cột cho văn bản dài, căn lề đều
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcommand{\hash}{\#}
+\geometry{top=2.5cm,bottom=2.5cm,left=3cm,right=2cm}
+\usepackage{url}
+
+\begin{document}
+
+\input{cover}   % Gọi trang bìa từ file cover.tex
+\input{nhanxet}
+\tableofcontents
+\newpage
+
+\chapter{GIỚI THIỆU BÀI TOÁN}
+\section{Đặt vấn đề}
+Trong những năm gần đây, lượng nội dung do người dùng tạo ra trên Internet đã tăng trưởng nhanh chóng. Người tiêu dùng ngày càng có xu hướng sử dụng các nền tảng trực tuyến để chia sẻ trải nghiệm của họ về sản phẩm, dịch vụ hoặc điểm đến du lịch. Những văn bản chứa ý kiến trực tuyến này, chẳng hạn như các bài đánh giá hay bài đăng trên mạng xã hội, đã trở thành nguồn thông tin quan trọng — không chỉ ảnh hưởng đến quyết định mua hàng của người tiêu dùng mà còn giúp các doanh nghiệp thu thập phản hồi có giá trị nhằm đo lường mức độ hài lòng của khách hàng và cải thiện chất lượng dịch vụ.
+
+Tuy nhiên, các phương pháp phân tích cảm xúc (Sentiment Analysis – SA) truyền thống, vốn chỉ tập trung phân loại toàn bộ văn bản thành ba nhóm cảm xúc chính (tích cực, tiêu cực hoặc trung tính), thường chưa đủ khả năng phản ánh sự phức tạp trong các đánh giá của người dùng. Trên thực tế, một bài đánh giá có thể chứa nhiều khía cạnh khác nhau — ví dụ, người dùng có thể khen ngợi chất lượng món ăn nhưng lại phàn nàn về dịch vụ hoặc không gian nhà hàng trong cùng một đoạn văn bản.
+
+Để khắc phục hạn chế đó, lĩnh vực Phân tích cảm xúc theo khía cạnh (Aspect-Based Sentiment Analysis – ABSA) đã được phát triển. ABSA là hướng nghiên cứu chuyên sâu hơn của phân tích cảm xúc, tập trung vào việc xác định các thực thể và khía cạnh cụ thể được đề cập trong văn bản, sau đó trích xuất cảm xúc mà người dùng thể hiện đối với từng khía cạnh đó. Cách tiếp cận này giúp mô hình hiểu rõ hơn về cấu trúc ý kiến và cung cấp những thông tin chi tiết, hữu ích cho việc ra quyết định, vượt trội hơn so với các hệ thống đánh giá tổng thể thông thường.
+
+\section{Mục tiêu nghiên cứu}
+Trong đề tài này, nhóm tập trung xây dựng hệ thống Phân tích cảm xúc theo khía cạnh (ABSA) trên bộ dữ liệu EduRABSA – bộ dữ liệu đánh giá giáo dục công khai đầu tiên bao gồm ba đối tượng chính: Khóa học (Course), Giảng viên (Teaching Staff) và Trường đại học (University).
+
+Mục tiêu cốt lõi là giải quyết bài toán Trích xuất bộ ba cảm xúc khía cạnh (Aspect Sentiment Triplet Extraction - ASTE) theo phương pháp tiếp cận đường ống (pipeline). Hệ thống sẽ thực hiện tuần tự việc trích xuất khía cạnh (AE) và phân loại cảm xúc (ASC) thành ba nhóm: Positive (tích cực), Negative (tiêu cực), và Neutral (trung lập), từ đó tổng hợp thành các bộ ba $< \text{Khía cạnh}, \text{Ý kiến}, \text{Cảm xúc} >$ hoàn chỉnh. 
+\section{Lý do chọn đề tài}
+Lý do chọn đề tài xuất phát từ cả nhu cầu thực tiễn ngày càng tăng trong việc khai thác dữ liệu ý kiến người dùng lẫn những thách thức hấp dẫn về mặt học thuật trong lĩnh vực xử lý ngôn ngữ tự nhiên (NLP), đặc biệt là với Phân tích cảm xúc theo khía cạnh (ABSA).
+
+Thứ nhất, về mặt thực tiễn, trong bối cảnh bùng nổ thông tin hiện nay, các ý kiến đánh giá trực tuyến của người dùng về sản phẩm và dịch vụ  có tác động lớn đến quyết định của người tiêu dùng và chiến lược kinh doanh của doanh nghiệp. Việc phân tích hàng loạt các đánh giá này một cách thủ công là không khả thi. Các tổ chức cần những công cụ tự động, tinh vi hơn là chỉ phân loại "tích cực" hay "tiêu cực" chung chung. Họ cần hiểu rõ khách hàng đang hài lòng hay không hài lòng về *khía cạnh cụ thể nào* (ví dụ: "pin điện thoại tốt" nhưng "camera chụp thiếu sáng kém", hoặc "ứng dụng dễ sử dụng" nhưng "dịch vụ hỗ trợ khách hàng chậm"). ABSA cung cấp khả năng phân tích chi tiết này, giúp trích xuất thông tin giá trị từ dữ liệu văn bản phi cấu trúc, hỗ trợ doanh nghiệp cải thiện sản phẩm/dịch vụ và đưa ra quyết định dựa trên dữ liệu (data-driven decisions).
+
+Thứ hai, về mặt học thuật, việc phân tích cảm xúc theo khía cạnh đặt ra những thách thức đáng kể cho các mô hình NLP. Như đã đề cập, ngôn ngữ do người dùng tạo ra thường không theo chuẩn mực, chứa nhiều biến thể, lỗi sai, cách diễn đạt ẩn ý, và thường thể hiện nhiều cảm xúc phức tạp, thậm chí trái ngược nhau, đối với các khía cạnh khác nhau trong cùng một câu hoặc đoạn văn (ví dụ: "Thiết kế đẹp nhưng chất liệu không bền."). Điều này đòi hỏi các mô hình phải có khả năng hiểu sâu về ngữ nghĩa, ngữ cảnh, cấu trúc câu và mối quan hệ giữa các từ ngữ, vượt ra ngoài việc chỉ nhận diện các từ khóa cảm xúc đơn lẻ. Các phương pháp truyền thống [insert mô hình vào] thường gặp giới hạn khi xử lý sự phức tạp này.
+
+Do đó, việc nghiên cứu, áp dụng và so sánh hiệu quả của các mô hình học sâu hiện đại cho bài toán ABSA, đặc biệt trên các bộ dữ liệu chuẩn hóa như SemEval, là hướng đi có ý nghĩa. Đề tài không chỉ giải quyết một nhu cầu thực tiễn quan trọng trong việc khai thác dữ liệu ý kiến mà còn góp phần vào sự phát triển của lĩnh vực NLP, nâng cao khả năng hiểu ngôn ngữ tự nhiên của máy tính trong các tình huống phức tạp.
+
+
+\chapter{TẬP DỮ LIỆU}
+\section{Giới thiệu bộ dữ liệu}
+Nghiên cứu sử dụng dữ liệu từ SemEval 2016 Task 5 (Aspect Based Sentiment Analysis) \footnote{Tham khảo thêm phiên bản xử lý tại Hugging Face Datasets: \url{https://huggingface.co/datasets/srinivasbilla/semeval-2016-absa-reviews-english-translated-stanford-alpaca}}, tập trung vào lĩnh vực đánh giá khách sạn (Hotel). Bộ dữ liệu gốc bao gồm các bài đánh giá (reviews) được chú thích chi tiết về khía cạnh (aspect term/category, ví dụ: "room", "service") và cảm xúc tương ứng (sentiment polarity: `positive`, `negative`, `neutral`). Phiên bản tham chiếu có thể đã được xử lý và định dạng lại (ví dụ: theo cấu trúc Stanford Alpaca) để phù hợp với việc huấn luyện mô hình. Đây là nguồn tài nguyên chuẩn hóa, phù hợp cho việc huấn luyện và đánh giá các hệ thống ABSA.
+
+
+\section{Quy tắc chú thích bộ dữ liệu}
+\subsection{Định nghĩa các thành phần của bộ dữ liệu}
+Trong bài toán Aspect-Based Sentiment Analysis (ABSA), chúng tôi tập trung vào ba bài toán chính được hỗ trợ bởi EduRABSA: Trích xuất cặp khía cạnh-ý kiến (AOPE), và Trích xuất bộ ba cảm xúc theo khía cạnh (ASTE). Dưới đây là định nghĩa các thành phần dữ liệu cấu thành nên các tác vụ này.
+
+\subsection{Các thành phần cơ bản}
+
+\subsubsection{Thuật ngữ khía cạnh (Aspect Term)} Thuật ngữ khía cạnh là các từ hoặc cụm từ xuất hiện nguyên văn (verbatim) trong câu, chỉ đối tượng cụ thể mà sinh viên đang đánh giá. \begin{itemize} \item Khía cạnh hiện (Explicit Aspect): Là từ ngữ xuất hiện trực tiếp. Ví dụ: Trong câu "The \textbf{labs} are pretty cool" (Các bài thực hành khá thú vị), thuật ngữ khía cạnh là "\textit{labs}". \item Khía cạnh ẩn (Implicit Aspect): Khi đối tượng được đánh giá không xuất hiện trong văn bản nhưng được hiểu ngầm qua ngữ cảnh. Trong EduRABSA, các trường hợp này được gán nhãn là NULL. Ví dụ: Câu "It's a waste of time!" (Thật phí thời gian!) ám chỉ khóa học, nhưng từ "khóa học" không xuất hiện, nên Aspect Term là NULL. \end{itemize}
+
+\subsubsection{Thuật ngữ ý kiến (Opinion Term)} Thuật ngữ ý kiến là các từ hoặc cụm từ thể hiện quan điểm hoặc thái độ của người viết đối với khía cạnh tương ứng. Đây là thành phần quan trọng để liên kết cảm xúc với khía cạnh trong bài toán AOPE và ASTE. \begin{itemize} \item Ví dụ: Trong câu "The concepts are \textbf{pretty cool}", thuật ngữ ý kiến là "\textit{pretty cool}". \item EduRABSA cũng chú thích các ý kiến ẩn (implicit opinions), nơi cảm xúc được thể hiện qua các mô tả thực tế hoặc mỉa mai mà không dùng tính từ cảm xúc rõ ràng. \end{itemize}
+
+\subsubsection{Cảm xúc (Sentiment Polarity)}
+Mỗi cặp <Khía cạnh, Ý kiến> được gán một nhãn cảm xúc để biểu thị thái độ của sinh viên. EduRABSA sử dụng ba nhãn cảm xúc tiêu chuẩn12:
+\begin{itemize}
+\item Positive: Đánh giá tích cực (Ví dụ: "Awesome teacher" $\rightarrow$ Positive.
+\item Negative: Đánh giá tiêu cực (Ví dụ: "fairly useless" $\rightarrow$ Negative).
+\item Neutral: Đánh giá trung lập hoặc cảm xúc pha trộn nhưng không nghiêng hẳn về phía nào (Ví dụ: "bearable" $\rightarrow$ Neutral).
+\end{itemize}
+
+\subsection{Định nghĩa các biến thể bài toán (Tasks)}Dựa trên các thành phần trên, dữ liệu được tổ chức thành các cấu trúc phục vụ cho các bài toán cụ thể sau:
+\subsubsection{Trích xuất cặp Khía cạnh - Ý kiến (AOPE)}Mục tiêu của AOPE (Aspect-Opinion Pair Extraction) là trích xuất các cặp tương ứng giữa đối tượng và từ ngữ mô tả nó.\begin{itemize}\item Định dạng: $< \text{Aspect Term}, \text{Opinion Term} >$.\item Ví dụ: Trong câu "The concepts and labs are pretty cool", hệ thống cần trích xuất hai cặp:$< \text{concepts}, \text{cool} >$ và $< \text{labs}, \text{cool} >$.\end{itemize}
+\subsubsection{Trích xuất bộ ba cảm xúc khía cạnh (ASTE)}ASTE (Aspect Sentiment Triplet Extraction) là bài toán mở rộng của AOPE, yêu cầu xác định thêm nhãn cảm xúc cho mỗi cặp khía cạnh-ý kiến. Đây là định dạng dữ liệu cốt lõi phản ánh đầy đủ ngữ nghĩa của câu đánh giá.\begin{itemize}\item Định dạng: $< \text{Aspect Term}, \text{Opinion Term}, \text{Sentiment} >$.\item Ví dụ: Với câu đánh giá "A fairly useless course" (Một khóa học khá vô dụng):Bộ ba trích xuất được là: $< \text{course}, \text{fairly useless}, \text{Negative} >$.\end{itemize}
+
+
+
+% \subsubsection{Danh mục khía cạnh (Aspect Category)}
+% Danh mục khía cạnh cho biết nội dung cụ thể mà người viết đang đề cập đến trong câu đánh giá.
+% Mỗi khía cạnh được biểu diễn bằng sự kết hợp giữa một Thực thể (Entity) và một Thuộc tính (Attribute), được chọn từ danh sách các cặp (E\#A) được định nghĩa sẵn trong bộ dữ liệu.
+
+% Ví dụ:
+
+% FOOD\#QUALITY – chất lượng món ăn
+
+% SERVICE\#GENERAL – dịch vụ nói chung
+
+% AMBIENCE\#PRICES – không gian và mức giá
+
+% Danh mục khía cạnh giúp hệ thống xác định người dùng đang nói về khía cạnh nào của nhà hàng, thay vì chỉ biết cảm xúc tổng thể của toàn câu.
+
+% \subsubsection{Biểu thức mục tiêu ý kiến (Opinion Target Expression – OTE)}
+% Biểu thức mục tiêu ý kiến là từ hoặc cụm từ cụ thể trong câu được dùng để chỉ đối tượng mà người viết bày tỏ ý kiến.
+% Nó thể hiện trung tâm ngữ nghĩa của câu đánh giá, đóng vai trò là mục tiêu mà cảm xúc hướng đến.
+
+% Ví dụ:
+
+% \begin{itemize}
+%     \item Trong câu “The pizza was delicious”, biểu thức mục tiêu là “pizza”.
+%     \item Trong câu “The staff was rude”, biểu thức mục tiêu là “staff”.
+% \end{itemize}
+% Nếu người viết thể hiện ý kiến mà không nhắc trực tiếp đến đối tượng, giá trị của OTE được gán là “NULL” (ví dụ: “It was too expensive” – không chỉ rõ đối tượng).
+% Nhờ xác định OTE, hệ thống có thể hiểu cảm xúc hướng đến đối tượng nào trong ngữ cảnh cụ thể.
+
+% \subsubsection{Cảm xúc (Sentiment Polarity)}
+% Cảm xúc là nhãn chỉ mức độ hoặc thái độ của người viết đối với khía cạnh đã được xác định.
+% Trong Subtask 1 của SemEval-2016, mỗi khía cạnh được gán một trong ba nhãn cảm xúc sau:
+% \begin{itemize}
+%     \item Positive: thể hiện đánh giá tích cực hoặc sự hài lòng.
+%     Ví dụ: “The food was excellent.”
+%     \item Negative: thể hiện đánh giá tiêu cực hoặc sự không hài lòng.
+%     Ví dụ: “The service was terrible.”
+%     \item Neutral: thể hiện thái độ trung lập, không nghiêng rõ ràng về hướng tích cực hay tiêu cực.
+%     Ví dụ: “The restaurant is located downtown.”
+% \end{itemize}
+%  Cảm xúc là thành phần giúp mô hình phân biệt thái độ của người viết với từng khía cạnh cụ thể, thay vì chỉ đưa ra nhận định tổng quan.
+% \subsection{Định nghĩa các nhãn cảm xúc}
+% Bộ dữ liệu SemEval-2016 Task 5 thuộc bài toán Aspect-Based Sentiment Analysis (ABSA) trong lĩnh vực đánh giá nhà hàng (Restaurant domain).
+% Mỗi câu trong tập dữ liệu có thể chứa một hoặc nhiều ý kiến (opinions), và mỗi ý kiến được gán một nhãn cảm xúc (sentiment polarity) thể hiện thái độ của người viết đối với khía cạnh được đề cập.
+% Các nhãn cảm xúc chính bao gồm ba loại sau:
+% \begin{itemize}
+%     \item Negative: Thể hiện cảm xúc tiêu cực, chẳng hạn như sự không hài lòng, thất vọng, phàn nàn hoặc chê bai về một khía cạnh cụ thể.
+%      Ví dụ: “The service was slow and unprofessional.”
+%     \item Neutral: Thể hiện thái độ trung lập, không biểu hiện rõ ràng cảm xúc tích cực hay tiêu cực. Những câu này thường mang tính mô tả hoặc đưa ra thông tin khách quan về sản phẩm hoặc dịch vụ.
+%      Ví dụ: “The restaurant is located downtown.”
+%     \item Positive: Thể hiện cảm xúc tích cực, chẳng hạn như sự hài lòng, khen ngợi, đánh giá cao hoặc yêu thích đối với khía cạnh được đề cập.
+%      Ví dụ: “The food was absolutely delicious.”
+% \end{itemize}
+\subsection{Quy trình gán nhãn}
+Khác với các phương pháp gán nhãn cộng đồng hay bán tự động thường thấy, dữ liệu trong tập EduRABSA được thực hiện hoàn toàn thủ công bởi chuyên gia nhằm đảm bảo độ chính xác cao nhất cho các tác vụ ABSA phức tạp. Quá trình chú thích (annotation) được triển khai thông qua công cụ chuyên dụng ASQE-DPT theo quy trình ba giai đoạn nghiêm ngặt:
+
+\begin{itemize}
+    \item Giai đoạn 1: Xây dựng giao thức và Thử nghiệm: Trước khi gán nhãn diện rộng, một giao thức chú thích chuẩn được thiết lập dựa trên các định nghĩa của SemEval và đặc thù miền giáo dục. Giao thức này được kiểm thử trên một tập mẫu ngẫu nhiên gồm 200 đánh giá để xác định các trường hợp nhập nhằng và tinh chỉnh bộ quy tắc.
+    \item Giai đoạn 2: Chú thích thủ công chuyên sâu: Quá trình gán nhãn được thực hiện bởi chuyên gia có kiến thức sâu về miền dữ liệu . Quy tắc gán nhãn tuân thủ nguyên tắc opinion-oriented:
+    \begin{enumerate}
+        \item Đầu tiên, xác định các từ ngữ mang ý kiến (cả tường minh và ẩn ý).
+        \item Sau đó, trích xuất các thuật ngữ khía cạnh (aspect terms) tương ứng dưới dạng từ nguyên văn (verbatim).
+        \item Cuối cùng, gán nhãn cảm xúc (Positive, Negative, Neutral) cho từng cặp Khía cạnh - Ý kiến cụ thể.
+    
+    \end{enumerate}
+    \item Giai đoạn 3: Kiểm soát chất lượng và Xử lý biên: Các trường hợp khó phân loại – ví dụ như ranh giới giữa thái độ giảng viên (Staff-Attitude) và tính cách cá nhân (Staff-Personal traits) – được thảo luận và giải quyết thông qua hội ý với các chuyên gia giáo dục. Sau khi hoàn tất, toàn bộ 6.500 mục dữ liệu được rà soát lại một lần nữa để đảm bảo tính nhất quán tuyệt đối giữa các nhãn.
+    
+\end{itemize}
+Đặc biệt, đối với các trường hợp văn bản không chứa từ ngữ chỉ khía cạnh rõ ràng nhưng vẫn mang hàm ý đánh giá (Implicit Aspect), quy trình cho phép gán nhãn NULL để mô hình có thể học được ngữ cảnh ẩn, thay vì bỏ qua như các phương pháp gán nhãn truyền thống.
+\subsection{Ví dụ minh họa}
+Để hình dung rõ hơn về cấu trúc dữ liệu đầu ra và cách thức gán nhãn của hệ thống ABSA trên tập dữ liệu EduRABSA, Bảng 2.1 dưới đây trình bày một số mẫu đánh giá điển hình. Các ví dụ này minh họa cho bài toán Trích xuất bộ ba cảm xúc (ASTE), trong đó mỗi mẫu dữ liệu bao gồm: (1) văn bản gốc, (2) các bộ ba được trích xuất (Aspect, Opinion, Sentiment), và (3) giải thích ngữ nghĩa.
+
+Dữ liệu bao gồm các trường hợp từ đơn giản (một khía cạnh) đến phức tạp (đa khía cạnh, cảm xúc trái chiều) và các trường hợp ẩn ý thường gặp trong phản hồi của sinh viên.
+% \begin{table}[h!]
+% \centering
+% \begin{tabularx}{\textwidth}{|X|c|c|}
+% \hline
+% Nội dung đánh giá (Review Text) & Nhãn bộ ba (ASTE Output) $< \text{Aspect}, \text{Opinion}, \text{Sentiment} >$ & Giải thích \\ \hline
+% (1) Đánh giá Giảng viên: "Awesome teacher. She makes class entertaining and will stay late to help you understand the material." & 1. < teacher, Awesome, Positive > 2. < class, entertaining, Positive > & Câu đánh giá thể hiện sự hài lòng tuyệt đối. Hệ thống trích xuất được hai khía cạnh riêng biệt: "teacher" (giáo viên) gắn với ý kiến khen ngợi "Awesome", và "class" (lớp học) gắn với trải nghiệm "entertaining". Cả hai đều mang nhãn Positive. \\ \hline
+% Nội dung khác & 15 & 25 \\ \hline
+% \end{tabularx}
+% \caption{Bảng tự động căng chỉnh bằng tabularx}
+% \end{table}
+
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.3} % Tăng khoảng cách giữa các dòng cho thoáng
+% Thiết lập tỷ lệ cột: Cột 1 (0.8), Cột 2 (0.8), Cột 3 (1.4). Tổng cộng = 3 (số lượng cột X)
+\begin{tabularx}{\textwidth}{ 
+    >{\hsize=0.8\hsize}X 
+    >{\hsize=0.8\hsize}X 
+    >{\hsize=1.4\hsize}X 
+}
+\toprule
+\textbf{Nội dung đánh giá} \newline (Review Text) & \textbf{Nhãn bộ ba} \newline (ASTE Output) & \textbf{Giải thích} \\ 
+\midrule
+
+(1) Đánh giá Giảng viên: ``Awesome teacher. She makes class entertaining and will stay late to help you understand the material.'' & 
+1. $\langle$ teacher, Awesome, Pos $\rangle$ \newline 
+2. $\langle$ class, entertaining, Pos $\rangle$ & 
+Câu đánh giá thể hiện sự hài lòng tuyệt đối. Hệ thống trích xuất được hai khía cạnh riêng biệt: ``teacher'' (giáo viên) gắn với ý kiến khen ngợi ``Awesome'', và ``class'' (lớp học) gắn với trải nghiệm ``entertaining''. Cả hai đều mang nhãn Positive. \\ 
+
+\midrule
+(2) Đánh giá Khóa học (Cảm xúc hỗn hợp): "A fairly useless and hard course. The concepts and labs are pretty cool though." & 
+1. $\langle$ course, useless, Negative $\rangle$ \newline 
+2. $\langle$ course, hard, Negative $\rangle$ \newline
+3. $\langle$ concepts, cool, Positive $\rangle$ \newline 
+4. $\langle$ labs, cool, Positive $\rangle$ \newline
+& Đây là ví dụ điển hình cho sự cần thiết của ABSA. Trong cùng một đoạn văn, sinh viên chê trách "course" (khóa học) là vô dụng/khó (Negative), nhưng lại khen ngợi "concepts" (khái niệm) và "labs" (bài thực hành) là thú vị (Positive). Phân tích cảm xúc thông thường sẽ thất bại trong việc nắm bắt sự mâu thuẫn này \\ 
+
+\midrule
+(3) Đánh giá Giảng viên (Tiêu cực): "He gives unclear instructions and unclear due dates." & 
+1. $\langle$ instructions, unclear, Negative $\rangle$ \newline 
+2. $\langle$ due dates, unclear, Negative $\rangle$ \newline
+& Đây là ví dụ điển hình cho sự cần thiết của ABSA. Trong cùng một đoạn văn, sinh viên chê trách "course" (khóa học) là vô dụng/khó (Negative), nhưng lại khen ngợi "concepts" (khái niệm) và "labs" (bài thực hành) là thú vị (Positive). Phân tích cảm xúc thông thường sẽ thất bại trong việc nắm bắt sự mâu thuẫn này \\ 
+
+\midrule
+(4) Đánh giá Khóa học (Khía cạnh ẩn): "Waste of time and money!" & 
+1. $\langle$ NULL, Waste of time, Negative $\rangle$ \newline 
+2. $\langle$ NULL, Waste of money, Negative $\rangle$ \newline
+& Trong trường hợp này, sinh viên không nhắc trực tiếp đến từ "khóa học" (course), nhưng ngữ cảnh ám chỉ rõ ràng đối tượng bị chê trách. Bộ dữ liệu EduRABSA gán nhãn khía cạnh là NULL (Implict Aspect) để biểu thị đối tượng ẩn, đi kèm với các cụm từ ý kiến tiêu cực mạnh mẽ.\\ 
+
+
+\bottomrule
+\end{tabularx}
+\caption{Ví dụ minh họa dữ liệu và nhãn bộ ba (ASTE)}
+\end{table}
+
+
+
+\section{Khám phá bộ dữ liệu}
+\subsection{Tập train sample}
+
+\subsection{Tập validation sample}
+
+\subsection{Tập test samples}
+
+
+\section{Kiểm tra chú thích bộ dữ liệu}
+Để đảm bảo dữ liệu đầu vào cho mô hình huấn luyện tuân thủ đúng định nghĩa của bài toán Trích xuất bộ ba cảm xúc (ASTE), nhóm thực hiện kiểm tra ngẫu nhiên và giải thích chi tiết một số mẫu dữ liệu đặc trưng từ tập EduRABSA. Quá trình này nhằm xác minh tính chính xác của việc liên kết giữa Thuật ngữ khía cạnh (Aspect), Thuật ngữ ý kiến (Opinion) và Nhãn cảm xúc (Sentiment).
+
+Dưới đây là bảng phân tích các mẫu đại diện, bao gồm cả các trường hợp đánh giá hỗn hợp và đánh giá ẩn ý:
+
+\begingroup % Nhóm này để giới hạn phạm vi của \arraystretch
+\renewcommand{\arraystretch}{1.5} % Giãn dòng 1.5
+\small % Cỡ chữ nhỏ
+
+% Định nghĩa lại cột X để căn lề trái (mặc định X là căn đều justify, đôi khi nhìn xấu với cột hẹp)
+% Nếu bạn muốn giữ justify thì giữ nguyên định nghĩa của bạn.
+% Dưới đây mình giữ nguyên định nghĩa tỷ lệ cột của bạn:
+
+\begin{xltabular}{\textwidth}{
+    >{\hsize=0.3\hsize\centering\arraybackslash}X  % Cột STT: 0.3
+    >{\hsize=1.3\hsize\raggedright\arraybackslash}X % Cột Text: 1.3 (Thêm raggedright cho đẹp)
+    >{\hsize=1.0\hsize\raggedright\arraybackslash}X % Cột Tuple: 1.0
+    >{\hsize=1.4\hsize\raggedright\arraybackslash}X % Cột Giải thích: 1.4
+}
+
+% --- PHẦN TIÊU ĐỀ CHO TRANG ĐẦU TIÊN ---
+\caption{Bảng kiểm tra và giải thích mẫu dữ liệu chú thích (70 mẫu)} \label{tab:my_long_table} \\
+\toprule
+\textbf{STT} & \textbf{Nội dung đánh giá} \newline (Review Text) & \textbf{Bộ ba trích xuất} \newline (ASTE Output) & \textbf{Giải thích quy tắc gán nhãn} \\
+\midrule
+\endfirsthead
+
+% --- PHẦN TIÊU ĐỀ CHO CÁC TRANG TIẾP THEO (Khi sang trang mới) ---
+\caption[]{Bảng kiểm tra và giải thích mẫu dữ liệu chú thích (tiếp theo)} \\
+\toprule
+\textbf{STT} & \textbf{Nội dung đánh giá} \newline (Review Text) & \textbf{Bộ ba trích xuất} \newline (ASTE Output) & \textbf{Giải thích quy tắc gán nhãn} \\
+\midrule
+\endhead
+
+% --- PHẦN CHÂN TRANG (Mỗi khi hết trang nhưng bảng chưa hết) ---
+\midrule
+\multicolumn{4}{r}{\textit{}} \\
+\endfoot
+
+% --- PHẦN CHÂN TRANG CUỐI CÙNG (Kết thúc bảng) ---
+\bottomrule
+\endlastfoot
+
+% --- NỘI DUNG DỮ LIỆU ---
+
+% HÀNG 1
+1 & 
+(1) Đánh giá Giảng viên: ``Awesome teacher. She makes class entertaining and will stay late to help you understand the material.'' & 
+1. $\langle$ teacher, Awesome, Pos $\rangle$ \newline 
+2. $\langle$ class, entertaining, Pos $\rangle$ & 
+Câu đánh giá thể hiện sự hài lòng tuyệt đối. Hệ thống trích xuất được hai khía cạnh riêng biệt: ``teacher'' và ``class'' đều mang nhãn Positive. \\ \midrule
+
+% HÀNG 2
+2 & 
+(2) Đánh giá Khóa học (Cảm xúc hỗn hợp): ``A fairly useless and hard course. The concepts and labs are pretty cool though.'' & 
+1. $\langle$ course, useless, Neg $\rangle$ \newline 
+2. $\langle$ course, hard, Neg $\rangle$ \newline
+3. $\langle$ concepts, cool, Pos $\rangle$ \newline 
+4. $\langle$ labs, cool, Pos $\rangle$ & 
+Ví dụ điển hình cho sự cần thiết của ABSA. Trong cùng một câu, sinh viên chê ``course'' (Neg), nhưng lại khen ``concepts'' và ``labs'' (Pos). Sentiment level câu sẽ thất bại. \\ \midrule
+
+% HÀNG 3
+3 & 
+(3) Đánh giá Giảng viên (Tiêu cực): ``He gives unclear instructions and unclear due dates.'' & 
+1. $\langle$ instructions, unclear, Neg $\rangle$ \newline 
+2. $\langle$ due dates, unclear, Neg $\rangle$ & 
+Các cụm từ mang tính phê phán trực tiếp vào phong cách giảng dạy. Từ ``unclear'' được lặp lại 2 lần gắn với 2 khía cạnh khác nhau là hướng dẫn và hạn nộp bài. \\ \midrule
+
+% HÀNG 4
+4 & 
+(4) Đánh giá Khóa học (Khía cạnh ẩn): ``Waste of time and money!'' & 
+1. $\langle$ NULL, Waste of time, Neg $\rangle$ \newline 
+2. $\langle$ NULL, Waste of money, Neg $\rangle$ & 
+Sinh viên không nhắc từ ``course'', nhưng ngữ cảnh ám chỉ rõ ràng. Gán nhãn khía cạnh là NULL (Implicit Aspect) đi kèm ý kiến tiêu cực mạnh. \\ \midrule
+
+% CÁC HÀNG TRỐNG (Ví dụ)
+5 & ... & ... & ... \\ \midrule
+6 & ... & ... & ... \\ \midrule
+% ... Bạn copy tiếp các dòng từ 7 đến 70 vào đây ...
+7	 & & & \\ \midrule
+8	 & & & \\ 
+9	 & & & \\ \midrule
+10	 & & & \\ \midrule
+11	 & & & \\ \midrule
+12	 & & & \\ \midrule
+13	 & & & \\ \midrule
+14	 & & & \\ \midrule
+15	 & & & \\ \midrule
+16	 & & & \\ \midrule
+17	 & & & \\ \midrule
+18	 & & & \\ \midrule
+19	 & & & \\ \midrule
+20	 & & & \\ \midrule
+21	 & & & \\ \midrule
+22	 & & & \\ \midrule
+23	 & & & \\ \midrule
+24	 & & & \\ \midrule
+25	 & & & \\ \midrule
+26	 & & & \\ \midrule
+27	 & & & \\ \midrule
+28	 & & & \\ \midrule
+29	 & & & \\ \midrule
+30	 & & & \\ 
+31	 & & & \\ \midrule
+32	 & & & \\ \midrule
+33	 & & & \\ \midrule
+34	 & & & \\ \midrule
+35	 & & & \\ \midrule
+36	 & & & \\ \midrule
+37	 & & & \\ \midrule
+38	 & & & \\ \midrule
+39	 & & & \\ \midrule
+40	 & & & \\ \midrule
+41	 & & & \\ \midrule
+42	 & & & \\ \midrule
+43	 & & & \\ \midrule
+44	 & & & \\ \midrule
+45	 & & & \\ \midrule
+46	 & & & \\ \midrule
+47	 & & & \\ \midrule
+48	 & & & \\ \midrule
+49	 & & & \\ \midrule
+50	 & & & \\ \midrule
+51	 & & & \\ \midrule
+52	 & & & \\ 
+53	 & & & \\ \midrule
+54	 & & & \\ \midrule
+55	 & & & \\ \midrule
+56	 & & & \\ \midrule
+57	 & & & \\ \midrule
+58	 & & & \\ \midrule
+59	 & & & \\ \midrule
+60	 & & & \\ \midrule
+61	 & & & \\ \midrule
+62	 & & & \\ \midrule
+63	 & & & \\ \midrule
+64	 & & & \\ \midrule
+65	 & & & \\ \midrule
+66	 & & & \\ \midrule
+67	 & & & \\ \midrule
+68	 & & & \\ \midrule
+69	 & & & \\ \midrule
+
+70 & ... & ... & ... \\ 
+
+\end{xltabular}
+\endgroup
+
+
+\chapter{MÔ HÌNH VÀ PHƯƠNG PHÁP SỬ DỤNG}
+\section{Kiến trúc Transformer và mô hình BERT}
+
+\section{Mô hình so sánh: BiLSTM-CRF}
+
+\section{Mô hình: T5-Base}
+
+\section{Tiền xử lý dữ liệu}
+
+\subsection{Tiền xử lý văn bản}
+\subsubsection{Chuẩn hóa Unicode}
+\subsubsection{Làm sạch HTML/URL}
+
+\subsubsection{Chuyển về chữ thường (Lowercasing)}
+
+\subsection{Tiền xử lý chuyên biệt cho BERT}
+\subsubsection{Tokenization bằng WordPiece}
+\subsubsection{Thêm Token đặc biệt}
+
+\subsubsection{Padding \& Truncating}
+
+
+
+\subsection{Tiền xử lý Nhãn}
+
+\subsubsection{Trích xuất khía cạnh (AE) - Gán nhãn BIO}
+
+\subsubsection{Phân loại cảm xúc (ASC)}
+
+
+
+\subsubsection{Trích xuất khía cạnh (AE) - Gán nhãn BIO}
+
+\subsubsection{Phân loại cảm xúc (ASC)}
+
+
+\section{Các chỉ số đánh giá hiệu suất}
+
+\subsection{Accuracy}
+
+\subsection{F1-score}
+
+\subsection{Precision}
+
+
+\subsection{Recall}
+
+\subsection{Macro-F1}
+
+\subsection{Confusion matrix}
+
+
+\subsection{Weighted-F1}
+
+
+
+\chapter{CÀI ĐẶT VÀ THỬ NGHIỆM}
+
+\section{Cài đặt mô hình  BiLSTM-CRF}
+
+\section{Cài đặt mô hình BERT}
+
+\section{Cài đặt mô hình T5-base}
+
+\section{Miêu tả mẫu quá trình bằng một mẫu dữ liệu}
+
+\section{Kết quả thử nghiệm}
+
+
+
+\chapter{KẾT LUẬN}
+
+\chapter*{TÀI LIỆU THAM KHẢO}
+\input{reference}
+
+\end{document}

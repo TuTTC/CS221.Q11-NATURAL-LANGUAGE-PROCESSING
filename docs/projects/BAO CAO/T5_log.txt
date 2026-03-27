@@ -1,0 +1,263 @@
+================================================================================
+LOADING T5-SMALL MODEL
+================================================================================
+
+Model Configuration:
+  d_model (hidden size): 512
+  d_ff (feed-forward size): 2048
+  num_layers: 6
+  num_heads: 8
+  vocab_size: 32128
+
+================================================================================
+ STEP 1: INPUT TEXT
+================================================================================
+
+   Input: 'best instructor on this campus, if you attend you will succeed. she is great!!!.'
+   Task: Extract (aspect, opinion, sentiment) triplets
+
+================================================================================
+ STEP 2: TOKENIZATION
+================================================================================
+
+   Raw text -> Tokens:
+      [0] '_best' -> ID: 200
+      [1] '_instructor' -> ID: 10617
+      [2] '_on' -> ID: 30
+      [3] '_this' -> ID: 48
+      [4] '_campus' -> ID: 4730
+      [5] ',' -> ID: 6
+      [6] '_' -> ID: 3
+      [7] 'if' -> ID: 99
+      [8] '_you' -> ID: 25
+      [9] '_attend' -> ID: 2467
+      [10] '_you' -> ID: 25
+      [11] '_will' -> ID: 56
+      [12] '_succeed' -> ID: 7229
+      [13] '.' -> ID: 5
+      [14] '_she' -> ID: 255
+      [15] '_is' -> ID: 19
+      [16] '_great' -> ID: 248
+      [17] '!!!' -> ID: 3158
+      [18] '.' -> ID: 5
+      [19] '</s>' -> ID: 1
+
+============================================================
+  Input IDs
+============================================================
+   Shape: torch.Size([1, 20])
+   Dtype: torch.int64
+   Sample values (first 5): [200, 10617, 30, 48, 4730]
+   Min: 1.0000, Max: 10617.0000
+
+============================================================
+  Attention Mask
+============================================================
+   Shape: torch.Size([1, 20])
+   Dtype: torch.int64
+   Sample values (first 5): [1, 1, 1, 1, 1]
+   Min: 1.0000, Max: 1.0000
+
+================================================================================
+ STEP 3: EMBEDDING LAYER
+================================================================================
+
+   The embedding layer converts token IDs to dense vectors.
+   Each token ID maps to a d_model (512 for t5-small) dimensional vector.
+   
+   Formula: embedding = Embedding(input_ids)
+   Shape: (batch, seq_len) -> (batch, seq_len, d_model)
+
+
+============================================================
+  Token Embeddings
+============================================================
+   Shape: torch.Size([1, 20, 512])
+   Dtype: torch.float32
+   Sample values (first 5): [8.723933219909668, -6.73738956451416, 27.083017349243164, 22.967374801635742, -5.132961750030518]
+   Min: -319.8695, Max: 90.9052
+
+   Each token is now a 512-dimensional vector
+
+================================================================================
+ STEP 4: T5 ENCODER
+================================================================================
+
+   The Encoder processes the input and creates contextualized representations.
+   T5-small has 6 encoder layers, each with:
+   
+   1. Self-Attention: Each token attends to ALL other tokens
+   2. Feed-Forward Network: Transforms the representations
+   3. Layer Normalization + Residual connections
+   
+   Input shape: (batch, seq_len, d_model)
+   Output shape: (batch, seq_len, d_model) - same shape, but contextualized!
+
+
+============================================================
+  Encoder Output (last_hidden_state)
+============================================================
+   Shape: torch.Size([1, 20, 512])
+   Dtype: torch.float32
+   Sample values (first 5): [-0.1786518543958664, -0.17643333971500397, 0.21684570610523224, 0.23403435945510864, -0.048958756029605865]
+   Min: -0.8519, Max: 0.6285
+
+   Encoder Attention:
+   - Number of attention layers: 6
+   - Attention shape per layer: torch.Size([1, 8, 20, 20])
+     (batch, num_heads, seq_len, seq_len)
+
+   Hidden States through layers:
+   - Layer 0: shape torch.Size([1, 20, 512])
+   - Layer 1: shape torch.Size([1, 20, 512])
+   - Layer 2: shape torch.Size([1, 20, 512])
+   - Layer 3: shape torch.Size([1, 20, 512])
+   - Layer 4: shape torch.Size([1, 20, 512])
+   - Layer 5: shape torch.Size([1, 20, 512])
+   - Layer 6: shape torch.Size([1, 20, 512])
+
+================================================================================
+ STEP 5: T5 DECODER (Auto-regressive Generation)
+================================================================================
+
+   The Decoder generates the output sequence token by token.
+   T5-small has 6 decoder layers, each with:
+   
+   1. Self-Attention: Attends to previously generated tokens
+   2. Cross-Attention: Attends to encoder outputs (the input text)
+   3. Feed-Forward Network
+   
+   Cross-Attention is KEY: This is how the decoder "looks at" the input
+   to decide what aspect/opinion/sentiment to extract!
+
+
+============================================================
+  Decoder Hidden State
+============================================================
+   Shape: torch.Size([1, 1, 512])
+   Dtype: torch.float32
+   Sample values (first 5): [0.2108982503414154, 0.3180742561817169, -0.041671402752399445, -0.04610330983996391, -0.016272662207484245]
+   Min: -7.5138, Max: 3.3909
+
+   Cross-Attention (Decoder -> Encoder):
+   - This shows which INPUT tokens the decoder attends to
+   - Shape: torch.Size([1, 8, 1, 20])
+     (batch, num_heads, decoder_seq_len, encoder_seq_len)
+
+   Cross-Attention weights (decoder start -> input tokens):
+      '_best          ': 0.0105 
+      '_instructor    ': 0.0332 #
+      '_on            ': 0.0145 
+      '_this          ': 0.0089 
+      '_campus        ': 0.0377 #
+      ',              ': 0.0552 ##
+      '_              ': 0.0031 
+      'if             ': 0.0026 
+      '_you           ': 0.0044 
+      '_attend        ': 0.0168 
+      '_you           ': 0.0066 
+      '_will          ': 0.0095 
+      '_succeed       ': 0.0051 
+      '.              ': 0.1331 ######
+      '_she           ': 0.0136 
+      '_is            ': 0.0196 
+      '_great         ': 0.0146 
+      '!!!            ': 0.0412 ##
+      '.              ': 0.1013 #####
+      '</s>           ': 0.4685 #######################
+
+================================================================================
+ STEP 6: OUTPUT PROJECTION (LM Head)
+================================================================================
+
+   The LM Head projects decoder hidden states to vocabulary logits.
+   
+   Input: (batch, seq_len, d_model) = decoder hidden states
+   Output: (batch, seq_len, vocab_size) = probability over all tokens
+   
+   The token with highest probability is selected at each position.
+
+
+============================================================
+  LM Logits
+============================================================
+   Shape: torch.Size([1, 1, 32128])
+   Dtype: torch.float32
+   Sample values (first 5): [-484.3145446777344, -260.6409606933594, -491.616455078125, -238.05003356933594, -596.3568725585938]
+   Min: -1412.7528, Max: -94.8535
+   Vocab size: 32128
+
+   Top 10 predicted next tokens:
+      '(': 1.0000
+      '</s>': 0.0000
+      '': 0.0000
+      ',': 0.0000
+      's': 0.0000
+      '<pad>': 0.0000
+      '<unk>': 0.0000
+      '.': 0.0000
+      'the': 0.0000
+      'X': 0.0000
+
+================================================================================
+ STEP 7: FULL GENERATION (Auto-regressive)
+================================================================================
+
+   T5 generates output token-by-token:
+   1. Start with <pad> token
+   2. Predict next token
+   3. Add predicted token to decoder input
+   4. Repeat until <eos> or max_length
+   
+   This is called "auto-regressive" generation.
+
+
+   Input: 'best instructor on this campus, if you attend you will succeed. she is great!!!.'
+
+   Generated Output: '(instructor, best, positive); (instructor, you will succeed, positive); (instructor, great!!!, positive)'
+
+   Generated token sequence:
+      [0] '<pad>' (ID: 0)
+      [1] '_(' (ID: 41)
+      [2] 'in' (ID: 77)
+      [3] 'struct' (ID: 7593)
+      [4] 'or' (ID: 127)
+      [5] ',' (ID: 6)
+      [6] '_best' (ID: 200)
+      [7] ',' (ID: 6)
+      [8] '_positive' (ID: 1465)
+      [9] ');' (ID: 3670)
+      [10] '_(' (ID: 41)
+      [11] 'in' (ID: 77)
+      [12] 'struct' (ID: 7593)
+      [13] 'or' (ID: 127)
+      [14] ',' (ID: 6)
+      [15] '_you' (ID: 25)
+      [16] '_will' (ID: 56)
+      [17] '_succeed' (ID: 7229)
+      [18] ',' (ID: 6)
+      [19] '_positive' (ID: 1465)
+
+================================================================================
+ STEP 8: PARSE OUTPUT TO TRIPLETS
+================================================================================
+
+   Raw output: '(instructor, best, positive); (instructor, you will succeed, positive); (instructor, great!!!, positive)'
+
+   Parsed triplets (3 found):
+      1. Aspect: 'instructor'
+         Opinion: 'best'
+         Sentiment: 'positive'
+
+      2. Aspect: 'instructor'
+         Opinion: 'you will succeed'
+         Sentiment: 'positive'
+
+      3. Aspect: 'instructor'
+         Opinion: 'great!!!'
+         Sentiment: 'positive'
+
+
+================================================================================
+ T5 ARCHITECTURE SUMMARY
+================================================================================
