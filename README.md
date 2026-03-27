@@ -91,8 +91,8 @@ Trên tập Split Train 9/1, mô hình T5-Base kết hợp tiền xử lý dữ 
 
 | Model | Dataset | F1-score | Precision | Recall |
 |-------|---------|----------|-----------|--------|
-| BiLSTM-CRF-Attention | Dataset 8/1/1 raw | 0.0927 | 0.1469 | 0.1137 |
-| BiLSTM-CRF-Attention | Dataset 8/1/1 preprocessed | 0.1145 | 0.1135 | 0.1156 |
+| BiLSTM-CRF-Attention | Dataset 9/1 raw | 0.0927 | 0.1469 | 0.1137 |
+| BiLSTM-CRF-Attention | Dataset 9/1 preprocessed | 0.1145 | 0.1135 | 0.1156 |
 | BERT | Split Train 9/1 raw | 0.4327 | 0.4443 | 0.4217 |
 | BERT | Split Train 9/1 preprocessed | 0.4376 | 0.4510 | 0.4250 |
 | **T5** | **Split Train 9/1 raw** | **0.5055** | **0.4994** | **0.5118** |
