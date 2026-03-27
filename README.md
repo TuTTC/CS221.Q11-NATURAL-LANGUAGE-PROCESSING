@@ -59,14 +59,30 @@ Dự án triển khai và so sánh 3 kiến trúc học sâu khác nhau để gi
 
 ```text
 CS221.Q11-NATURAL-LANGUAGE-PROCESSING/
-├── models/                     # Thư mục chứa tài nguyên mô hình
-│   ├── model_crf.pth           # Trọng số mô hình BiLSTM-CRF
-│   ├── model_sent.pth          # Trọng số mô hình BiLSTM-Attention
-│   ├── requirements.txt        # Danh sách thư viện phụ thuộc
-│   └── vocab.pkl               # File từ điển (Vocabulary) cho BiLSTM
-├── app.py                      # Mã nguồn giao diện Gradio Demo
-├── [ten_file_hinh_demo].png    # Hình ảnh demo giao diện Gradio (Nhớ đổi tên cho đúng)
-└── README.md                   # Tài liệu dự án
+├── docs/                           # Thư mục chứa tài liệu và báo cáo
+│   └── projects/
+│       ├── BAO CAO/                # Source code LaTeX 
+│       ├── DOAN/                   # Thư mục chứa các file huấn luyện Đồ án
+│       ├── Task_ASTE_BERT_T5_raw_preprocessed.ipynb
+│       ├── Task_ASTE_pre.ipynb
+│       ├── Task_ASTE_raw.ipynb
+│       ├── bilstm-crf-attention-processed.ipynb
+│       └── bilstm-crf-attention-raw.ipynb
+├── models/                         # Thư mục chứa tài nguyên mô hình
+│   ├── model_crf.pth               # Trọng số mô hình BiLSTM-CRF
+│   ├── model_sent.pth              # Trọng số mô hình BiLSTM-Attention
+│   ├── requirements.txt            # Danh sách thư viện phụ thuộc
+│   └── vocab.pkl                   # File từ điển (Vocabulary) cho BiLSTM
+├── notebooks/                      # Thư mục chứa các bài thực hành môn học
+│   ├── TH2/                        
+│   ├── TH3/POS-Starting-Kit/       
+│   └── *.ipynb                     
+├── scripts/                        # Thư mục chứa mã nguồn chạy thử nghiệm
+├── .gitignore                      # File cấu hình bỏ qua của Git
+├── app.py                          # Mã nguồn giao diện Gradio Demo chính
+├── demo.png                        # Hình ảnh preview giao diện Gradio
+├── move_files.ps1                  # Script hỗ trợ quản lý file
+└── README.md                       # Tài liệu dự án
 ```
 ---
 
